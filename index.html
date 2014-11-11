@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>自製視訊互動文字詩 by林豪鏘x張小均</title>
+
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>自製視訊互動文字詩 by林豪鏘x張小均</h1>
+
+    <h2>輸入你的詩</h2>
+        <textarea id="txt" style="width:300px;height:200px">
+於是你的思緒不斷行走
+
+你我被錯置在相同維度感受空間奧秘，自非偶然。
+時間被切割成不同形狀，直逼視野乍現序列之紛繁，於是。
+於是你的思緒不斷行走。
+
+文字在你側臉的窗外飛舞，身姿的抑揚令人眼花撩亂。
+無從捕捉的困頓與書寫的速度形成層遞效果，於是。
+於是你的思緒不斷行走。
+
+美學本體是一顆顆璀燦的結晶，色彩韻致以超然俱化。
+猶如真心躍動，絕無蹈空之作。
+路人持續以言語穿透你的軀殼，
+龐沛之勢在場域中連結蒙太奇軌跡，用身體感傳頌述志之辭。
+
+真實與無意識在你側臉一再切替，形成旅程的構圖。
+無終點是你的終點，或夢或醒的情境流變為沿途的車站。
+你嘗試各種角度喃喃透視窗外文字的舞姿，探索你我的互動關係。
+迸湧的共構景緻，讓我無法與自己分割。於是。
+於是，我的思緒不斷行走。</textarea>
+<div>
+    <video id="video" autoplay width="640"></video>
+    <canvas id="snapshot" width="640" height="480" style="display:none"></canvas>
+    <canvas id="diff" width="640" height="480"></canvas>
+</div>
+
+    <script type="text/javascript">
+
+        function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+
+        var video = document.querySelector('#video');
+        var canvas = document.querySelector('#snapshot');
+        var ctx = canvas.getContext('2d');
+        var canvas2 = document.querySelector('#diff');
+        var ctx2 = canvas2.getContext('2d');
+
+        var fillText = "鏘";
+        $(function() {
+
+          //console.log(      $("#txt").val()[] );
+         
+
+
+  
+
+
+        var previous = null;
+        function snapshot() {
+            ctx.drawImage(video, 0, 0);
+            var current = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            if (previous != null) {
+                var newImage = ctx2.createImageData(canvas2.width, canvas2.height);
+                ctx2.putImageData(newImage, 0, 0);
+
+                for (var i = 0; i < previous.data.length; i+=24) {
+                    var rDelta = Math.abs(previous.data[i] - current.data[i]);
+                    var gDelta = Math.abs(previous.data[i + 1] - current.data[i + 1]);
+                    var bDelta = Math.abs(previous.data[i + 2] - current.data[i + 2]);
+                    var delta = (rDelta + gDelta + bDelta) / 3;
+                    if (delta > 30) {
+                        newImage.data[i] = 255;
+                        newImage.data[i + 1] = 255;
+                        newImage.data[i + 2] = 255;
+
+                           fillText =  $("#txt").val()[ rand( 0 , $("#txt").val().length-1  ) ]
+
+
+
+                          ctx2.textBaseline = "top";
+                         // ctx2.font = "30pt Arial";
+
+                          ctx2.fillStyle = "rgb("+current.data[i]+","+current.data[i+1]+","+current.data[i+2]+")";
+                          ctx2.fillText(fillText, i/4%640 , i/4/480);
+                       // console.log(i)
+
+
+                    }
+
+
+
+
+
+                  //  newImage.data[i + 3] = 255;
+                }
+
+
+               // ctx2.putImageData(newImage, 0, 0);
+
+                     
+
+            }
+            previous = current;
+           // setTimeout(snapshot, 10);
+            webkitRequestAnimationFrame(snapshot);
+        }
+        navigator.webkitGetUserMedia({'video':true}, function(stream) {
+            var url = window.webkitURL.createObjectURL(stream);
+            video.src = url;
+            snapshot();
+        }, function(e) {
+            console.log("Failed!",e);
+        });
+
+
+            });
+    </script>
+
+</body>
+</html>
